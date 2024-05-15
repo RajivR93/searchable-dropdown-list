@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './style.css'
+import './style.css';
 
 interface PostInputProps {
   onCreate: (content: string) => void; // Function to handle post creation
@@ -13,7 +13,7 @@ const PostInput: React.FC<PostInputProps> = ({ onCreate }) => {
   const [mentions, setMentions] = useState<string[]>([]);
   const [filteredMentions, setFilteredMentions] = useState<string[]>([]); // New state for filtered mentions
 
-  const allMentions = ["Samuel Jackson", "Binoy David", "Jackson", "Selar"]; // Your list of mentions
+  const allMentions = ["Samuel Jackson", "Binoy David", "Jackson", "Selar", "Rajiv"]; // Your list of mentions
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(event.target.value);
@@ -59,39 +59,56 @@ const PostInput: React.FC<PostInputProps> = ({ onCreate }) => {
     setMentions([]);
   };
 
+  const renderMentionItem = (mention: string) => {
+    const firstLetter = mention[0];
+    const randomColor = getRandomColor();
+
+    return (
+      <li key={mention} onClick={() => handleMentionSelect(mention)}>
+        <span style={{ backgroundColor: randomColor, padding: '2px 5px', borderRadius: '3px', marginRight: '5px', color: '#fff' }}>{firstLetter}</span>
+        {mention}
+      </li>
+    );
+  };
+
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
   return (
     <div className="">
-      <textarea
-        className="border rounded p-2 w-100 h-24 focus:outline-none focus:border-blue-500"
-        value={content}
-        onChange={handleInputChange}
-        onKeyPress={handleKeyPress}
-      />
-      {showMentions && (
-        <div className="absolute mt-1 w-25 bg-white rounded shadow-md serch-box" >
-          <input
-            className="p-1 border-b focus:outline-none focus:border-blue-500"
-            placeholder="Search..."
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-          
-          <ul className='list-style'>
-            {filteredMentions.map((mention) => (
-              <li key={mention} onClick={() => handleMentionSelect(mention)}>
-                {mention}
-              </li>
-            ))}
-          </ul>
-          
-        </div>
-      )}
+      <div style={{ position: 'relative' }}>
+        <textarea
+          className="border rounded p-2 w-100 h-24 focus:outline-none focus:border-blue-500"
+          value={content}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+        />
+        {showMentions && (
+          <div className="position-absolute mt-2 w-40 bg-white rounded shadow-md search-box" style={{ top: '180%', left: '70%' }}>
+            <input
+              className="p-1 border-b focus:outline-none focus:border-blue-500"
+              placeholder="Search..."
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+            <ul className='list-style'>
+              {filteredMentions.map((mention) => renderMentionItem(mention))}
+            </ul>
+          </div>
+        )}
+      </div>
       <div className='button-container'>
-      <button
-        className="button"
-        onClick={handleCreatePost}
-      >
-        Post
-      </button>
+        <button
+          className="button"
+          onClick={handleCreatePost}
+        >
+          Post
+        </button>
       </div>
     </div>
   );
